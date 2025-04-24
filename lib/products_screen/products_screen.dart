@@ -1,10 +1,11 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moc_4_2025/core/models/product.dart';
 import 'package:moc_4_2025/products_screen/cart_screen/cart_screen.dart';
 import 'package:moc_4_2025/products_screen/product_detail_screen/product_detail_screen.dart';
+import 'package:moc_4_2025/products_screen/widgets/product_list_item.dart';
 
-import 'widgets/product_list_item.dart';
+import '../core/products_bloc/products_bloc.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -14,30 +15,11 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  final List<Product> _products = [];
-  bool _loading = true;
-  Exception? _error;
-
   @override
   void initState() {
     super.initState();
-    _getAllProducts();
-  }
-
-  void _getAllProducts() async {
-    try {
-      final response = await Dio().get('https://dummyjson.com/products');
-      if (response.statusCode == 200) {
-        final data = response.data['products'] as List;
-        _products.addAll(data.map((product) => Product.fromJson(product)).toList());
-      }
-    } catch (error) {
-      _error = error as Exception;
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
+    final productsBloc = BlocProvider.of<ProductsBloc>(context);
+    productsBloc.add(GetAllProducts());
   }
 
   @override
@@ -52,15 +34,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
-      body: _buildContent(context),
+      body: BlocBuilder<ProductsBloc, ProductsState>(
+        builder: (context, state) {
+          return switch (state.status) {
+            ProductsStatus.initial || ProductsStatus.loading => _buildLoading(context),
+            ProductsStatus.error => _buildError(context, state.error),
+            ProductsStatus.success => _buildProductsList(context, state.products),
+          };
+        },
+      ),
     );
-  }
-
-  Widget _buildContent(BuildContext context) {
-    if (_loading) return _buildLoading(context);
-    if (_error != null) return _buildError(context);
-    if (_products.isEmpty) return _buildEmpty(context);
-    return _buildProductsList(context);
   }
 
   Widget _buildLoading(BuildContext context) {
@@ -69,10 +52,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  Widget _buildError(BuildContext context) {
+  Widget _buildError(BuildContext context, Exception? error) {
     return Center(
       child: Text(
-        _error?.toString() ?? 'Erreur inconnue',
+        error?.toString() ?? 'Erreur inconnue',
         style: const TextStyle(color: Colors.red),
       ),
     );
@@ -84,11 +67,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  Widget _buildProductsList(BuildContext context) {
+  Widget _buildProductsList(BuildContext context, List<Product> products) {
+    if (products.isEmpty) return _buildEmpty(context);
     return ListView.builder(
-      itemCount: _products.length,
+      itemCount: products.length,
       itemBuilder: (context, index) {
-        final product = _products[index];
+        final product = products[index];
         return ProductListItem(
           product: product,
           onTap: () => _onProductTap(context, product),

@@ -35,5 +35,7 @@ class ProductDetailScreen extends StatelessWidget {
     );
   }
 
-  void _onAddToCart(BuildContext context) {}
+  void _onAddToCart(BuildContext context) {
+
+  }
 }
