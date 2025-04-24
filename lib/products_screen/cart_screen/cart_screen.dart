@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../core/blocs/cart_bloc/cart_bloc.dart';
+import '../../core/models/product.dart';
+import '../widgets/product_list_item.dart';
 
 class CartScreen extends StatelessWidget {
   static const String routeName = '/cart';
@@ -15,7 +20,25 @@ class CartScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Panier'),
       ),
-      body: _buildEmptyCart(context),
+      body: BlocBuilder<CartBloc, CartState>(
+        builder: (context, state) {
+          final products = state.products;
+          return _buildList(context, products);
+        },
+      ),
+    );
+  }
+
+  Widget _buildList(BuildContext context, List<Product> products) {
+    if (products.isEmpty) return _buildEmptyCart(context);
+    return ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        return ProductListItem(
+          product: product,
+        );
+      },
     );
   }
 

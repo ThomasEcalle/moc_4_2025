@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 
-import '../models/product.dart';
+import '../../models/product.dart';
 
 part 'products_event.dart';
 part 'products_state.dart';

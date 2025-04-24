@@ -5,7 +5,9 @@ import 'package:moc_4_2025/products_screen/cart_screen/cart_screen.dart';
 import 'package:moc_4_2025/products_screen/product_detail_screen/product_detail_screen.dart';
 import 'package:moc_4_2025/products_screen/widgets/product_list_item.dart';
 
-import '../core/products_bloc/products_bloc.dart';
+import '../core/blocs/cart_bloc/cart_bloc.dart';
+import '../core/blocs/products_bloc/products_bloc.dart';
+
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -28,9 +30,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
       appBar: AppBar(
         title: const Text('Produits'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () => _onCartIconTap(context),
+          BlocBuilder<CartBloc, CartState>(
+            builder: (context, state) {
+              print('Coucou, je build l\icône de panier');
+              return IconButton(
+                icon: Row(
+                  children: [
+                    const Icon(Icons.shopping_cart),
+                    Text('${state.products.length}')
+                  ],
+                ),
+                onPressed: () => _onCartIconTap(context),
+              );
+            },
           ),
         ],
       ),
