@@ -8,7 +8,6 @@ import 'package:moc_4_2025/products_screen/widgets/product_list_item.dart';
 import '../core/blocs/cart_bloc/cart_bloc.dart';
 import '../core/blocs/products_bloc/products_bloc.dart';
 
-
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
 
@@ -31,13 +30,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
         title: const Text('Produits'),
         actions: [
           BlocBuilder<CartBloc, CartState>(
+            buildWhen: (CartState previous, CartState current) => previous.products.length != current.products.length,
             builder: (context, state) {
-              print('Coucou, je build l\icône de panier');
+              print('Coucou, je build l\'icône de panier');
               return IconButton(
                 icon: Row(
                   children: [
                     const Icon(Icons.shopping_cart),
-                    Text('${state.products.length}')
+                    Text('${state.products.length}'),
                   ],
                 ),
                 onPressed: () => _onCartIconTap(context),
@@ -48,6 +48,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
       body: BlocBuilder<ProductsBloc, ProductsState>(
         builder: (context, state) {
+          print('Building products list');
           return switch (state.status) {
             ProductsStatus.initial || ProductsStatus.loading => _buildLoading(context),
             ProductsStatus.error => _buildError(context, state.error),

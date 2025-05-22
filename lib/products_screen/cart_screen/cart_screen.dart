@@ -16,16 +16,14 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //final products = context.read<CartBloc>().state.products;
+    final products = context.select((CartBloc cartBloc) => cartBloc.state.products);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Panier'),
       ),
-      body: BlocBuilder<CartBloc, CartState>(
-        builder: (context, state) {
-          final products = state.products;
-          return _buildList(context, products);
-        },
-      ),
+      body: _buildList(context, products),
     );
   }
 

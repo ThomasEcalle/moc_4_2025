@@ -18,14 +18,14 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     final existingProducts = state.products;
     final productToAdd = event.product;
 
-    emit(state.copyWith(
-      status: CartStatus.errorAddingProduct,
-      error: Exception('Oups, produit indisponible'),
-    ));
-
     // emit(state.copyWith(
-    //   status: CartStatus.successAddingProduct,
-    //   products: [...existingProducts, productToAdd],
+    //   status: CartStatus.errorAddingProduct,
+    //   error: Exception('Oups, produit indisponible'),
     // ));
+
+    emit(state.copyWith(
+      status: CartStatus.successAddingProduct,
+      products: [...existingProducts, productToAdd],
+    ));
   }
 }
