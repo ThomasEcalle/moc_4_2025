@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
+import 'package:moc_4_2025/core/repositories/products/products_repository.dart';
 
 import '../../models/product.dart';
 
@@ -8,7 +8,9 @@ part 'products_event.dart';
 part 'products_state.dart';
 
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
-  ProductsBloc() : super(ProductsState()) {
+  final ProductsRepository productsRepository;
+
+  ProductsBloc({required this.productsRepository}) : super(ProductsState()) {
     on<GetAllProducts>(_onGetAllProducts);
   }
 
@@ -16,7 +18,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     emit(ProductsState(status: ProductsStatus.loading));
 
     try {
-      final products = await _getAllProducts();
+      final products = await productsRepository.getProducts();
       emit(ProductsState(
         status: ProductsStatus.success,
         products: products,
@@ -27,15 +29,5 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         error: error as Exception,
       ));
     }
-  }
-
-  Future<List<Product>> _getAllProducts() async {
-    final response = await Dio().get('https://dummyjson.com/products');
-    if (response.statusCode == 200) {
-      final data = response.data['products'] as List;
-      return data.map((product) => Product.fromJson(product)).toList();
-    }
-
-    throw Exception('Oups, une erreur est survenue');
   }
 }
