@@ -3,11 +3,12 @@ import 'package:moc_4_2025/core/repositories/products/products_data_source.dart'
 
 class ProductsRepository {
   final ProductsDataSource productsDataSource;
-  final ProductsDataSource localDataSource;
+
+  //final ProductsDataSource localDataSource;
 
   const ProductsRepository({
     required this.productsDataSource,
-    required this.localDataSource,
+    //required this.localDataSource,
   });
 
   Future<List<Product>> getProducts() async {
@@ -16,7 +17,8 @@ class ProductsRepository {
       //await localDataSource.save(products);
       return products;
     } catch (error) {
-      return localDataSource.getProducts();
+      //return localDataSource.getProducts();
+      throw Exception('Oups, une erreur est survenue');
     }
   }
 
